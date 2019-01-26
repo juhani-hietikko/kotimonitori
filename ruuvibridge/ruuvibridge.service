@@ -1,0 +1,12 @@
+[Unit]
+Description=Collects ruuvitag sensor data from local tags and sends it to cloud
+
+[Service]
+Type=simple
+WorkingDirectory=/home/pi
+ExecStart=/home/pi/ruuvienv/bin/python ruuvibridge.py
+User=pi
+Group=pi
+
+[Install]
+WantedBy=multi-user.target
