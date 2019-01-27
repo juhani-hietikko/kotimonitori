@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python -u
 
 import boto3
 
@@ -25,6 +25,10 @@ tags = {
     },
     'F2:F6:4B:B0:A7:27': {
         'name': 'Garden'
+    },
+    'EF:6D:A7:E0:25:63': {
+        'name': 'Back Door',
+        'is_door_sensor': True
     }
 }
 
@@ -42,10 +46,45 @@ def metricdata(tag, sample, metric_name, metric_key, unit='None'):
         'Unit': unit
     }
 
+def report_motion(tag, motion_value):
+    cloudwatch.put_metric_data(
+        Namespace='DetectionV1',
+        MetricData=[
+            {
+                'MetricName': 'Motion',
+                'Dimensions': [
+                    {
+                        'Name': 'tagname',
+                        'Value': tag['name']
+                    },
+                ],
+                'Value': motion_value,
+                'Unit': 'None'
+            }
+        ]
+    )
+
 
 def process_sample(sample):
     tag_mac = sample[0]
     tag = tags.get(tag_mac)
+
+    if tag.get('is_door_sensor'):
+        now = datetime.now()
+        acc = sample[1]['acceleration_z']
+        if tag.get('last_sample'):
+            delta_time = (now - tag['last_sample']).total_seconds()
+            delta_acc = acc - tag['last_acc']
+            motion = abs(delta_acc / delta_time)
+
+            if motion + tag['last_motion']  > 25:
+                report_motion(tag, motion + tag['last_motion'])
+        else:
+            motion = 0.0
+
+        tag['last_sample'] = now
+        tag['last_acc'] = acc
+        tag['last_motion'] = motion
 
     if tag:
         now = datetime.now()
