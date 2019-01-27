@@ -19,6 +19,19 @@ tags = {
 }
 
 
+def metricdata(tag, sample, metric_name, metric_key, unit='None'):
+    return {
+        'MetricName': metric_name,
+        'Dimensions': [
+            {
+                'Name': 'tagname',
+                'Value': tag['name']
+            },
+        ],
+        'Value': sample[1][metric_key],
+        'Unit': unit
+    }
+
 
 def process_sample(sample):
     tag_mac = sample[0]
@@ -28,19 +41,11 @@ def process_sample(sample):
         now = datetime.now()
         if now - tag['last_upload'] >= timedelta(minutes=1):
             cloudwatch.put_metric_data(
-                Namespace='Test3',
+                Namespace='Test5',
                 MetricData=[
-                    {
-                        'MetricName': 'Temperature',
-                        'Dimensions': [
-                            {
-                                'Name': 'tagname',
-                                'Value': tag['name']
-                            },
-                        ],
-                        'Value': sample[1]['temperature'],
-                        'Unit': 'Count'
-                    }
+                    metricdata(tag, sample, 'Temperature', 'temperature'),
+                    metricdata(tag, sample, 'Pressure', 'pressure'),
+                    metricdata(tag, sample, 'Humidity', 'humidity', 'Percent')
                 ]
             )
             tag['last_upload'] = now
