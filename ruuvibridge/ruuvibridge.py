@@ -9,12 +9,10 @@ cloudwatch = boto3.client('cloudwatch')
 
 tags = {
     'D2:B4:89:37:FE:5E': {
-        'name': 'Freezer',
-        'last_upload': datetime.now() - timedelta(minutes=1)
+        'name': 'Freezer'
     },
     'C6:57:4E:37:1E:66': {
-        'name': 'Fridge',
-        'last_upload': datetime.now() - timedelta(minutes=1)
+        'name': 'Fridge'
     }
 }
 
@@ -52,4 +50,8 @@ def process_sample(sample):
 
 
 if __name__ == '__main__':
+    now = datetime.now()
+    for mac in tags:
+        tags[mac]['last_upload'] = now - timedelta(minutes=1)
+
     RuuviTagSensor.get_datas(process_sample)
