@@ -17,6 +17,9 @@ tags = {
     'E4:C5:67:4E:6B:37': {
         'name': 'Small Bedroom'
     },
+    'FC:CA:62:B3:1F:6B': {
+        'name': 'Large Bedroom'
+    },
     'D3:08:3A:26:44:84': {
         'name': 'Bathroom'
     },
@@ -28,6 +31,10 @@ tags = {
     },
     'EF:6D:A7:E0:25:63': {
         'name': 'Back Door',
+        'is_door_sensor': True
+    },
+    'E2:A8:17:03:41:6D': {
+        'name': 'Front Door',
         'is_door_sensor': True
     }
 }
