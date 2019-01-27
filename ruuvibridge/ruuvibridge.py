@@ -2,34 +2,33 @@
 
 import boto3
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from ruuvitag_sensor.ruuvi import RuuviTagSensor
 
 cloudwatch = boto3.client('cloudwatch')
 
 tags = {
     'D2:B4:89:37:FE:5E': {
-        'name': 'Fridge',
-        'hour_last_upload': -1
+        'name': 'Freezer',
+        'last_upload': datetime.now() - timedelta(minutes=1)
     },
     'C6:57:4E:37:1E:66': {
-        'name': 'Freezer',
-        'hour_last_upload': -1
+        'name': 'Fridge',
+        'last_upload': datetime.now() - timedelta(minutes=1)
     }
 }
+
+
 
 def process_sample(sample):
     tag_mac = sample[0]
     tag = tags.get(tag_mac)
 
     if tag:
-        hour_now = datetime.now().hour
-        if tag['hour_last_upload'] != hour_now:
-            print(tag_mac)
-            print(tag['name'])
-            print(sample[1]['temperature'])
+        now = datetime.now()
+        if now - tag['last_upload'] >= timedelta(minutes=1):
             cloudwatch.put_metric_data(
-                Namespace='Test2',
+                Namespace='Test3',
                 MetricData=[
                     {
                         'MetricName': 'Temperature',
@@ -44,7 +43,7 @@ def process_sample(sample):
                     }
                 ]
             )
-            tag['hour_last_upload'] = hour_now
+            tag['last_upload'] = now
 
 
 if __name__ == '__main__':
