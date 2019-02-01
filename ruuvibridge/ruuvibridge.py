@@ -8,8 +8,12 @@ from collections import deque
 from statistics import median
 from ruuvitag_sensor.ruuvi import RuuviTagSensor
 
-logging.basicConfig()
+
 logger = logging.getLogger('ruuvibridge')
+logger.setLevel(logging.DEBUG)
+fh = logging.FileHandler('/home/pi/ruuvibridge.log')
+fh.setLevel(logging.DEBUG)
+logger.addHandler(fh)
 
 cloudwatch = boto3.client('cloudwatch')
 
