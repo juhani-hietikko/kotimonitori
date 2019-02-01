@@ -9,10 +9,13 @@ from statistics import median
 from ruuvitag_sensor.ruuvi import RuuviTagSensor
 
 
+logging.basicConfig()
 logger = logging.getLogger('ruuvibridge')
 logger.setLevel(logging.DEBUG)
 fh = logging.FileHandler('/home/pi/ruuvibridge.log')
 fh.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+fh.setFormatter(formatter)
 logger.addHandler(fh)
 
 cloudwatch = boto3.client('cloudwatch')
@@ -126,6 +129,11 @@ def abs_sum(values):
 
 def record_potential_motion(tag, sample):
     if len(tag['acc_history_total']) >= 20:
+        
+        if not tag['door_sensing_initialized']:
+            tag['door_sensing_initialized'] = True
+            logger.info('Door sensing initialized for tag ' + tag['name'])
+
         deviation_total = sample[1]['acceleration'] - tag['normal_acc_total']
         deviation_x = sample[1]['acceleration_x'] - tag['normal_acc_x']
         deviation_y = sample[1]['acceleration_y'] - tag['normal_acc_y']
@@ -182,7 +190,7 @@ def process_sample(sample):
 
 
 if __name__ == '__main__':
-    logger.info('MOI!!')
+    logger.info('ruuvibridge startup...')
     now = datetime.now()
     for mac in tags:
         tag = tags[mac]
@@ -196,6 +204,7 @@ if __name__ == '__main__':
             tag['acc_deviation_y'] = deque()
             tag['acc_deviation_z'] = deque()
             tag['samplecounter'] = 0
+            tag['door_sensing_initialized'] = False
 
         tags[mac]['last_upload'] = now - timedelta(minutes=1)
 
