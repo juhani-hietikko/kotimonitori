@@ -1,0 +1,42 @@
+service:
+  name: alertCenter
+
+frameworkVersion: ">=1.0.0 <2.0.0"
+
+provider:
+  name: aws
+  runtime: python3.7
+  stage: ${opt:stage, 'prod'}
+  region: ${opt:region, 'eu-north-1'}
+  stackName: alertcenter
+  apiName: alertcenter
+  deploymentBucket:
+    name: name.jhie.${self:provider.region}.serverless.deploys
+    serverSideEncryption: AES256
+  apiKeys:
+    - ${env:API_KEY}
+  apiGateway:
+    apiKeySourceType: HEADER
+    minimumCompressionSize: 1024
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          path: hello
+          method: get
+          private: true
+
+
+#plugins:
+#  - serverless-api-cloudfront
+
+#custom:
+#  apiCloudFront:
+#    domain: jhie.name
+#    certificate: arn:aws:acm:eu-north-1:298836031929:certificate/105f15ea-82c5-4e69-abe3-979074776d40
+#    compress: true
+#    cookies: none
+#    headers:
+#      - x-api-key
