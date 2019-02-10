@@ -14,7 +14,7 @@ provider:
     name: name.jhie.${self:provider.region}.serverless.deploys
     serverSideEncryption: AES256
   apiKeys:
-    - ${env:API_KEY}
+    - ruuvibridge
   apiGateway:
     apiKeySourceType: HEADER
     minimumCompressionSize: 1024
@@ -28,15 +28,12 @@ functions:
           method: get
           private: true
 
+plugins:
+  - serverless-domain-manager
 
-#plugins:
-#  - serverless-api-cloudfront
-
-#custom:
-#  apiCloudFront:
-#    domain: jhie.name
-#    certificate: arn:aws:acm:eu-north-1:298836031929:certificate/105f15ea-82c5-4e69-abe3-979074776d40
-#    compress: true
-#    cookies: none
-#    headers:
-#      - x-api-key
+custom:
+  customDomain:
+    domainName: jhie.name
+    basePath: ''
+    stage: ${self:provider.stage}
+    createRoute53Record: true
