@@ -20,12 +20,12 @@ provider:
     minimumCompressionSize: 1024
 
 functions:
-  hello:
-    handler: handler.hello
+  motion:
+    handler: handler.sensor_motion
     events:
       - http:
-          path: hello
-          method: get
+          path: motion
+          method: post
           private: true
 
 plugins:
