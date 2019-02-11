@@ -2,6 +2,7 @@
 
 import boto3
 import logging
+import requests
 
 from datetime import datetime, timedelta
 from collections import deque
@@ -19,6 +20,8 @@ fh.setFormatter(formatter)
 logger.addHandler(fh)
 
 cloudwatch = boto3.client('cloudwatch')
+ssm = boto3.client('ssm')
+api_key = ssm.get_parameter(Name='ruuvibridge-api-key', WithDecryption=True)['Parameter']['Value']
 
 tags = {
     'D2:B4:89:37:FE:5E': {
@@ -165,6 +168,17 @@ def record_potential_motion(tag, sample):
             report_motion(tag, 'x', deviation_sum_x)
             report_motion(tag, 'y', deviation_sum_y)
             report_motion(tag, 'z', deviation_sum_z)
+            requests.post('https://jhie.name/motion',
+                          headers={'X-Api-Key': api_key},
+                          data = {
+                              'tag': tag['name'],
+                              'acceleration_samples': {
+                                  'total': tag['acc_deviation_total'],
+                                  'x': tag['acc_deviation_x'],
+                                  'y': tag['acc_deviation_y'],
+                                  'z': tag['acc_deviation_z']
+                              }
+                          })
 
 
 def process_sample(sample):
