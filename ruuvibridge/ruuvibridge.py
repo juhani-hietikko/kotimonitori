@@ -3,6 +3,7 @@
 import boto3
 import logging
 import requests
+import json
 
 from datetime import datetime, timedelta
 from collections import deque
@@ -169,16 +170,17 @@ def record_potential_motion(tag, sample):
             report_motion(tag, 'y', deviation_sum_y)
             report_motion(tag, 'z', deviation_sum_z)
             requests.post('https://jhie.name/motion',
-                          headers={'X-Api-Key': api_key},
-                          data = {
+                          headers={'X-Api-Key': api_key,
+                                   'Content-type': 'application/json'},
+                          data = json.dumps({
                               'tag': tag['name'],
                               'acceleration_samples': {
-                                  'total': tag['acc_deviation_total'],
-                                  'x': tag['acc_deviation_x'],
-                                  'y': tag['acc_deviation_y'],
-                                  'z': tag['acc_deviation_z']
+                                  'total': list(tag['acc_deviation_total']),
+                                  'x': list(tag['acc_deviation_x']),
+                                  'y': list(tag['acc_deviation_y']),
+                                  'z': list(tag['acc_deviation_z'])
                               }
-                          })
+                          }))
 
 
 def process_sample(sample):
