@@ -32,12 +32,19 @@ provider:
 
 functions:
   door_sensor_detection:
-    handler: handler.door_sensor_detection
+    handler: door_sensor_detection.handle
     events:
       - http:
           path: doorsensordetection
           method: post
           private: true
+  motion_detection:
+    handler: motion_detection.handle
+    events:
+      - http:
+          path: motiondetection
+          method: post
+          private: false
 
 plugins:
   - serverless-domain-manager
@@ -72,4 +79,23 @@ resources:
         TimeToLiveSpecification:
           AttributeName: Expires
           Enabled: true
-
+    MotionDetectionTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: MotionDetection
+        AttributeDefinitions:
+          - AttributeName: Detector
+            AttributeType: S
+          - AttributeName: EventTime
+            AttributeType: N
+        KeySchema:
+          - AttributeName: Detector
+            KeyType: HASH
+          - AttributeName: EventTime
+            KeyType: RANGE
+        SSESpecification:
+          SSEEnabled: true
+        BillingMode: PAY_PER_REQUEST
+        TimeToLiveSpecification:
+          AttributeName: Expires
+          Enabled: true

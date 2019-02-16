@@ -11,7 +11,7 @@ def dynamo_list(list):
     return [{'N': str(val)} for val in list]
 
 
-def door_sensor_detection(event, context):
+def handle(event, context):
     req_body = json.loads(event['body'])
     tag = req_body['tag']
     timestamp_ms = math.floor(1000 * datetime.utcnow().timestamp())
