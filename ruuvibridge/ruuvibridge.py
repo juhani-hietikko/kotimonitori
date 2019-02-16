@@ -109,8 +109,8 @@ def abs_sum(values):
     return result
 
 
-def record_potential_motion(tag, sample):
-    if len(tag['acc_history_total']) >= 20:
+def record_potential_motion(tag, sample, now):
+    if tag['door_sensing_initialized'] or len(tag['acc_history_total']) >= 20:
         
         if not tag['door_sensing_initialized']:
             tag['door_sensing_initialized'] = True
@@ -132,12 +132,14 @@ def record_potential_motion(tag, sample):
             tag['acc_deviation_y'].popleft()
             tag['acc_deviation_z'].popleft()
 
-        deviation_sum_total = abs_sum(tag['acc_deviation_total'])
+        #deviation_sum_total = abs_sum(tag['acc_deviation_total'])
         deviation_sum_x = abs_sum(tag['acc_deviation_x'])
         deviation_sum_y = abs_sum(tag['acc_deviation_y'])
         deviation_sum_z = abs_sum(tag['acc_deviation_z'])
 
-        if deviation_sum_x + deviation_sum_y + deviation_sum_z > 70:
+        if now - tag['last_motion'] >= timedelta(minutes=1) \
+                and deviation_sum_x + deviation_sum_y + deviation_sum_z > 70:
+            tag['last_motion'] = now
             requests.post('https://jhie.name/motion',
                           headers={'X-Api-Key': api_key,
                                    'Content-type': 'application/json'},
@@ -155,13 +157,13 @@ def record_potential_motion(tag, sample):
 def process_sample(sample):
     tag_mac = sample[0]
     tag = tags.get(tag_mac)
+    now = datetime.now()
 
     if tag.get('is_door_sensor'):
         keep_track_of_acceleration(tag, sample)
-        record_potential_motion(tag, sample)
+        record_potential_motion(tag, sample, now)
 
     if tag:
-        now = datetime.now()
         if now - tag['last_upload'] >= timedelta(minutes=1):
             cloudwatch.put_metric_data(
                 Namespace='HomeEnvironV1',
@@ -190,6 +192,7 @@ if __name__ == '__main__':
             tag['acc_deviation_z'] = deque()
             tag['samplecounter'] = 0
             tag['door_sensing_initialized'] = False
+            tag['last_motion'] = now - timedelta(minutes=1)
 
         tags[mac]['last_upload'] = now - timedelta(minutes=1)
 
