@@ -31,7 +31,7 @@ provider:
         - "*"
 
 functions:
-  motion:
+  door_sensor_detection:
     handler: handler.door_sensor_detection
     events:
       - http:
