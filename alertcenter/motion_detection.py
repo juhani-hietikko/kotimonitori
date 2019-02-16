@@ -19,15 +19,17 @@ def handle(event, context):
         }
 
     detector = req_body['detector']
-    timestamp_ms = math.floor(1000 * datetime.utcnow().timestamp())
-    expires = math.floor((datetime.utcnow() + timedelta(days=30)).timestamp())
+    now = datetime.utcnow()
+    timestamp_ms = math.floor(1000 * now.timestamp())
+    expires = math.floor((now + timedelta(days=30)).timestamp())
 
     dynamo.put_item(
         TableName='MotionDetection',
         Item={
             'Detector': {'S': detector},
             'EventTime': {'N': str(timestamp_ms)},
-            'Expires': {'N': str(expires)}
+            'Expires': {'N': str(expires)},
+            'EventTimeStr': {'S': str(now)}
         }
     )
     return {

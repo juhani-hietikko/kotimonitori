@@ -14,8 +14,9 @@ def dynamo_list(list):
 def handle(event, context):
     req_body = json.loads(event['body'])
     tag = req_body['tag']
-    timestamp_ms = math.floor(1000 * datetime.utcnow().timestamp())
-    expires = math.floor((datetime.utcnow() + timedelta(days=30)).timestamp())
+    now = datetime.utcnow()
+    timestamp_ms = math.floor(1000 * now.timestamp())
+    expires = math.floor((now + timedelta(days=30)).timestamp())
 
     acc_total = dynamo_list(req_body['acceleration_samples']['total'])
     acc_x = dynamo_list(req_body['acceleration_samples']['x'])
@@ -27,6 +28,7 @@ def handle(event, context):
         Item={
             'Tag': {'S': tag},
             'EventTime': {'N': str(timestamp_ms)},
+            'EventTimeStr': {'S': str(now)},
             'AccelerationSamplesTotal': {'L': acc_total},
             'AccelerationSamplesX': {'L': acc_x},
             'AccelerationSamplesY': {'L': acc_y},
