@@ -80,28 +80,6 @@ def metricdata(tag, sample, metric_name, metric_key, unit='None'):
         'Unit': unit
     }
 
-def report_motion(tag, axis, acc_deviation):
-    cloudwatch.put_metric_data(
-        Namespace='MotionTest1',
-        MetricData=[
-            {
-                'MetricName': 'AccelerationDeviation',
-                'Dimensions': [
-                    {
-                        'Name': 'tagname',
-                        'Value': tag['name']
-                    },
-                    {
-                        'Name': 'axis',
-                        'Value': axis
-                    }
-                ],
-                'Value': acc_deviation,
-                'Unit': 'None'
-            }
-        ]
-    )
-
 
 def keep_track_of_acceleration(tag, sample):
     if tag['samplecounter'] == 0:
@@ -160,15 +138,6 @@ def record_potential_motion(tag, sample):
         deviation_sum_z = abs_sum(tag['acc_deviation_z'])
 
         if deviation_sum_x + deviation_sum_y + deviation_sum_z > 70:
-            logger.info('MOTION: ' + tag['name'])
-            logger.info('t: ' + str(tag['acc_deviation_total']))
-            logger.info('x: ' + str(tag['acc_deviation_x']))
-            logger.info('y: ' + str(tag['acc_deviation_y']))
-            logger.info('z: ' + str(tag['acc_deviation_z']))
-            report_motion(tag, 'total', deviation_sum_total)
-            report_motion(tag, 'x', deviation_sum_x)
-            report_motion(tag, 'y', deviation_sum_y)
-            report_motion(tag, 'z', deviation_sum_z)
             requests.post('https://jhie.name/motion',
                           headers={'X-Api-Key': api_key,
                                    'Content-type': 'application/json'},
