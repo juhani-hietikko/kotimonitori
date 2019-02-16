@@ -37,3 +37,27 @@ custom:
     basePath: ''
     stage: ${self:provider.stage}
     createRoute53Record: true
+
+resources:
+  Description: Dynamo table for storing motion events
+  Resources:
+    MotionTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: motion
+        AttributeDefinitions:
+          - AttributeName: Tag
+            AttributeType: S
+          - AttributeName: EventTime
+            AttributeType: N
+        KeySchema:
+          - AttributeName: Tag
+            KeyType: HASH
+          - AttributeName: EventTime
+            KeyType: RANGE
+        SSESpecification:
+          SSEEnabled: true
+        BillingMode: PAY_PER_REQUEST
+        TimeToLiveSpecification:
+          AttributeName: Expires
+          Enabled: true
