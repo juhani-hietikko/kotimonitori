@@ -140,7 +140,7 @@ def record_potential_motion(tag, sample, now):
         if now - tag['last_motion'] >= timedelta(minutes=1) \
                 and deviation_sum_x + deviation_sum_y + deviation_sum_z > 70:
             tag['last_motion'] = now
-            requests.post('https://jhie.name/motion',
+            requests.post('https://jhie.name/doorsensordetection',
                           headers={'X-Api-Key': api_key,
                                    'Content-type': 'application/json'},
                           data = json.dumps({

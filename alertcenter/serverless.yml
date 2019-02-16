@@ -32,10 +32,10 @@ provider:
 
 functions:
   motion:
-    handler: handler.sensor_motion
+    handler: handler.door_sensor_detection
     events:
       - http:
-          path: motion
+          path: doorsensordetection
           method: post
           private: true
 
@@ -50,12 +50,12 @@ custom:
     createRoute53Record: true
 
 resources:
-  Description: Dynamo table for storing motion events
+  Description: DynamoDB tables for alertcenter
   Resources:
-    MotionTable:
+    DoorSensorDetectionTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: motion
+        TableName: DoorSensorDetection
         AttributeDefinitions:
           - AttributeName: Tag
             AttributeType: S
@@ -72,3 +72,4 @@ resources:
         TimeToLiveSpecification:
           AttributeName: Expires
           Enabled: true
+

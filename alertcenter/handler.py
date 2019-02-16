@@ -11,7 +11,7 @@ def dynamo_list(list):
     return [{'N': str(val)} for val in list]
 
 
-def sensor_motion(event, context):
+def door_sensor_detection(event, context):
     req_body = json.loads(event['body'])
     tag = req_body['tag']
     timestamp_ms = math.floor(1000 * datetime.utcnow().timestamp())
@@ -23,7 +23,7 @@ def sensor_motion(event, context):
     acc_z = dynamo_list(req_body['acceleration_samples']['z'])
 
     dynamo.put_item(
-        TableName='motion',
+        TableName='DoorSensorDetection',
         Item={
             'Tag': {'S': tag},
             'EventTime': {'N': str(timestamp_ms)},
