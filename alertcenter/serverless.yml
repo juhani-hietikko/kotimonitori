@@ -29,6 +29,13 @@ provider:
         - dynamodb:GetItem
       Resource:
         - "*"
+    - Effect: Allow
+      Action:
+        - ssm:Get*
+        - ssm:List*
+        - ssm:Describe*
+      Resource:
+        - "*"
 
 functions:
   door_sensor_detection:
