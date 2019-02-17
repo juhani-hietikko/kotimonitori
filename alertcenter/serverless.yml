@@ -52,6 +52,12 @@ functions:
           path: motiondetection
           method: post
           private: false
+  temperature_alarm:
+    handler: temperature_alarm.handle
+    events:
+      - sns:
+          topicName: temperature_alarm
+          displayName: Temperature alarm
 
 plugins:
   - serverless-domain-manager
@@ -64,7 +70,7 @@ custom:
     createRoute53Record: true
 
 resources:
-  Description: DynamoDB tables for alertcenter
+  Description: AWS resources for alertcenter
   Resources:
     DoorSensorDetectionTable:
       Type: AWS::DynamoDB::Table
@@ -106,3 +112,22 @@ resources:
         TimeToLiveSpecification:
           AttributeName: Expires
           Enabled: true
+    FreezerTemperatureAlarm:
+      Type: AWS::CloudWatch::Alarm
+      Properties:
+        ActionsEnabled: true
+        AlarmActions:
+          - arn:aws:sns:eu-north-1:298836031929:temperature_alarm
+        AlarmDescription: High freezer temperature
+        AlarmName: FreezerTemperatureAlarm
+        ComparisonOperator: GreaterThanThreshold
+        Dimensions:
+          - Name: tagname
+            Value: Freezer
+        EvaluationPeriods: 5
+        MetricName: Temperature
+        Namespace: HomeEnvironV1
+        Period: 60
+        Statistic: Maximum
+        Threshold: -18.0
+        TreatMissingData: ignore
