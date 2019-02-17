@@ -126,7 +126,7 @@ def record_potential_motion(tag, sample, now):
         tag['acc_deviation_y'].append(deviation_y)
         tag['acc_deviation_z'].append(deviation_z)
 
-        if len(tag['acc_deviation_total']) > 5:
+        if len(tag['acc_deviation_total']) > 3:
             tag['acc_deviation_total'].popleft()
             tag['acc_deviation_x'].popleft()
             tag['acc_deviation_y'].popleft()
