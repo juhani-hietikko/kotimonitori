@@ -1,10 +1,14 @@
 import json
 import math
 import boto3
-
+import urllib.parse
+from botocore.vendored import requests
 from datetime import datetime, timedelta
 
+
 dynamo = boto3.client('dynamodb')
+ssm = boto3.client('ssm')
+ifttt_key = ssm.get_parameter(Name='ifttt-webhook-key', WithDecryption=True)['Parameter']['Value']
 
 
 def dynamo_list(list):
@@ -36,6 +40,9 @@ def handle(event, context):
             'Expires': {'N': str(expires)}
         }
     )
+    notification_url = 'https://maker.ifttt.com/trigger/door_alarm_notification/with/key/' + ifttt_key + '?value1=' + urllib.parse.quote(tag)
+    requests.post(notification_url)
+
     response = {
         'statusCode': 200,
         'body': 'Registered motion for tag ' + tag
