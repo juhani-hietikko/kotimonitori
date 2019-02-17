@@ -112,14 +112,14 @@ resources:
         TimeToLiveSpecification:
           AttributeName: Expires
           Enabled: true
-    FreezerTemperatureAlarm:
+    FreezerHighTemperatureAlarm:
       Type: AWS::CloudWatch::Alarm
       Properties:
         ActionsEnabled: true
         AlarmActions:
           - arn:aws:sns:eu-north-1:298836031929:temperature_alarm
         AlarmDescription: High freezer temperature
-        AlarmName: FreezerTemperatureAlarm
+        AlarmName: FreezerHighTemperatureAlarm
         ComparisonOperator: GreaterThanThreshold
         Dimensions:
           - Name: tagname
@@ -130,4 +130,61 @@ resources:
         Period: 60
         Statistic: Maximum
         Threshold: -18.0
+        TreatMissingData: ignore
+    FreezerLowTemperatureAlarm:
+      Type: AWS::CloudWatch::Alarm
+      Properties:
+        ActionsEnabled: true
+        AlarmActions:
+          - arn:aws:sns:eu-north-1:298836031929:temperature_alarm
+        AlarmDescription: Low freezer temperature
+        AlarmName: FreezerLowTemperatureAlarm
+        ComparisonOperator: LessThanThreshold
+        Dimensions:
+          - Name: tagname
+            Value: Freezer
+        EvaluationPeriods: 5
+        MetricName: Temperature
+        Namespace: HomeEnvironV1
+        Period: 60
+        Statistic: Minimum
+        Threshold: -30.0
+        TreatMissingData: ignore
+    FridgeHighTemperatureAlarm:
+      Type: AWS::CloudWatch::Alarm
+      Properties:
+        ActionsEnabled: true
+        AlarmActions:
+          - arn:aws:sns:eu-north-1:298836031929:temperature_alarm
+        AlarmDescription: High fridge temperature
+        AlarmName: FridgeHighTemperatureAlarm
+        ComparisonOperator: GreaterThanThreshold
+        Dimensions:
+          - Name: tagname
+            Value: Fridge
+        EvaluationPeriods: 5
+        MetricName: Temperature
+        Namespace: HomeEnvironV1
+        Period: 60
+        Statistic: Maximum
+        Threshold: 4.5
+        TreatMissingData: ignore
+    FridgeLowTemperatureAlarm:
+      Type: AWS::CloudWatch::Alarm
+      Properties:
+        ActionsEnabled: true
+        AlarmActions:
+          - arn:aws:sns:eu-north-1:298836031929:temperature_alarm
+        AlarmDescription: Low fridge temperature
+        AlarmName: FridgeLowTemperatureAlarm
+        ComparisonOperator: LessThanThreshold
+        Dimensions:
+          - Name: tagname
+            Value: Fridge
+        EvaluationPeriods: 5
+        MetricName: Temperature
+        Namespace: HomeEnvironV1
+        Period: 60
+        Statistic: Minimum
+        Threshold: 0.1
         TreatMissingData: ignore
