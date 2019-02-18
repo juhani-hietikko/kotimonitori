@@ -5,6 +5,7 @@ import boto3
 from datetime import datetime, timedelta
 
 dynamo = boto3.client('dynamodb')
+cloudwatch = boto3.client('cloudwatch')
 ssm = boto3.client('ssm')
 api_key = ssm.get_parameter(Name='motion-detector-api-key', WithDecryption=True)['Parameter']['Value']
 
@@ -31,6 +32,22 @@ def handle(event, context):
             'Expires': {'N': str(expires)},
             'EventTimeStr': {'S': str(now)}
         }
+    )
+    cloudwatch.put_metric_data(
+        Namespace='MovementDetectionV1',
+        MetricData=[
+            {
+                'MetricName': 'MovementDetections',
+                'Dimensions': [
+                    {
+                        'Name': 'detector',
+                        'Value': detector
+                    },
+                ],
+                'Value': 1,
+                'Unit': 'Count'
+            }
+        ]
     )
     return {
         'statusCode': 200,

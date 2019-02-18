@@ -36,6 +36,11 @@ provider:
         - ssm:Describe*
       Resource:
         - "*"
+    - Effect: Allow
+      Action:
+        - cloudwatch:PutMetricData
+      Resource:
+        - "*"
 
 functions:
   door_sensor_detection:
