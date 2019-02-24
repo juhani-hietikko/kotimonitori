@@ -2,6 +2,7 @@ import json
 import math
 import boto3
 import urllib.parse
+from alarm_activation_schedule import is_target_active_now
 from botocore.vendored import requests
 from datetime import datetime, timedelta
 

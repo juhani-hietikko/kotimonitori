@@ -136,6 +136,23 @@ resources:
         SSESpecification:
           SSEEnabled: true
         BillingMode: PAY_PER_REQUEST
+    AlarmActivationScheduleTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: AlarmActivationSchedule
+        AttributeDefinitions:
+          - AttributeName: Target
+            AttributeType: S
+          - AttributeName: ScheduleName
+            AttributeType: S
+        KeySchema:
+          - AttributeName: Target
+            KeyType: HASH
+          - AttributeName: ScheduleName
+            KeyType: RANGE
+        SSESpecification:
+          SSEEnabled: true
+        BillingMode: PAY_PER_REQUEST
     FreezerHighTemperatureAlarm:
       Type: AWS::CloudWatch::Alarm
       Properties:
