@@ -46,23 +46,14 @@ tags = {
     'DD:18:D0:A1:50:D7': {
         'name': 'Back Door',
         'is_door_sensor': True,
-        # 'opening_direction': 1,
-        # 'x_direction': 1,
-        # 'y_direction': 1
     },
     'EF:6D:A7:E0:25:63': {
         'name': 'Back Door Out',
         'is_door_sensor': True,
-        # 'opening_direction': -1,
-        # 'x_direction': 1,
-        # 'y_direction': 1
     },
     'E2:A8:17:03:41:6D': {
         'name': 'Front Door',
         'is_door_sensor': True,
-        # 'opening_direction': -1,
-        # 'x_direction': -1,
-        # 'y_direction': 1
     }
 }
 
