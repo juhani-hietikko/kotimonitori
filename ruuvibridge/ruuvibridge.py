@@ -24,6 +24,9 @@ cloudwatch = boto3.client('cloudwatch')
 ssm = boto3.client('ssm')
 api_key = ssm.get_parameter(Name='ruuvibridge-api-key', WithDecryption=True)['Parameter']['Value']
 
+status = {
+}
+
 tags = {
     'D2:B4:89:37:FE:5E': {
         'name': 'Freezer'
@@ -166,6 +169,27 @@ def process_sample(sample):
             )
             tag['last_upload'] = now
 
+    if now - status['last_heartbeat'] >= timedelta(minutes=5):
+        with open('/proc/uptime', 'r') as f:
+            uptime_seconds = int(float(f.readline().split()[0]))
+        cloudwatch.put_metric_data(
+            Namespace='DiagnosticsV1',
+            MetricData=[
+                {
+                    'MetricName': 'Uptime',
+                    'Dimensions': [
+                        {
+                            'Name': 'systemname',
+                            'Value': 'hallonpaj-ruuvibridge'
+                        },
+                    ],
+                    'Value': uptime_seconds,
+                    'Unit': 'Seconds'
+                }
+            ]
+        )
+        status['last_heartbeat'] = now
+
 
 if __name__ == '__main__':
     logger.info('ruuvibridge startup...')
@@ -186,5 +210,7 @@ if __name__ == '__main__':
             tag['last_motion'] = now - timedelta(minutes=1)
 
         tags[mac]['last_upload'] = now - timedelta(minutes=1)
+
+    status['last_heartbeat'] = now - timedelta(minutes=5)
 
     RuuviTagSensor.get_datas(process_sample)
