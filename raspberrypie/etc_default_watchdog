@@ -5,4 +5,4 @@ run_wd_keepalive=1
 # Load module before starting watchdog
 watchdog_module="none"
 # Specify additional watchdog options here (see manpage).
-watchdog_options=" --softboot "
+watchdog_options=""
