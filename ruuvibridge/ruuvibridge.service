@@ -3,6 +3,7 @@ Description=Collects ruuvitag sensor data from local tags and sends it to cloud
 
 [Service]
 Type=simple
+Restart=on-failure
 WorkingDirectory=/home/pi
 ExecStart=/home/pi/ruuvienv/bin/python ruuvibridge.py
 User=pi
