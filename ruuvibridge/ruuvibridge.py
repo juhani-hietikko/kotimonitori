@@ -22,47 +22,24 @@ logger.addHandler(fh)
 
 cloudwatch = boto3.client('cloudwatch')
 ssm = boto3.client('ssm')
+dynamo = boto3.client('dynamodb')
 api_key = ssm.get_parameter(Name='ruuvibridge-api-key', WithDecryption=True)['Parameter']['Value']
 
-status = {
-}
 
-tags = {
-    'D2:B4:89:37:FE:5E': {
-        'name': 'Freezer'
-    },
-    'C6:57:4E:37:1E:66': {
-        'name': 'Fridge'
-    },
-    'E4:C5:67:4E:6B:37': {
-        'name': 'Small Bedroom'
-    },
-    'FC:CA:62:B3:1F:6B': {
-        'name': 'Large Bedroom'
-    },
-    'D3:08:3A:26:44:84': {
-        'name': 'Bathroom'
-    },
-    'F2:F6:4B:B0:A7:27': {
-        'name': 'Garden'
-    },
-    'DD:18:D0:A1:50:D7': {
-        'name': 'Back Door',
-        'is_door_sensor': True,
-    },
-    'EF:6D:A7:E0:25:63': {
-        'name': 'Back Door Out',
-        'is_door_sensor': True,
-    },
-    'E2:A8:17:03:41:6D': {
-        'name': 'Front Door',
-        'is_door_sensor': True,
-    },
-    'C7:74:89:CD:F5:E1': {
-        'name': 'TK Door',
-        'is_door_sensor': True,
-    }
-}
+def fetch_tag_config():
+    config_items = dynamo.scan(TableName='TagConfiguration')['Items']
+    config = {}
+    for config_item in config_items:
+        tag_mac = config_item['MacAddress']['S']
+        config[tag_mac] = {
+            'name': config_item['Tag']['S'],
+            'is_door_sensor': config_item['IsDoorSensor']['BOOL']
+        }
+    return config
+
+
+tags = fetch_tag_config()
+status = {}
 
 
 def metricdata(tag, sample, metric_name, metric_key, unit='None'):
@@ -130,7 +107,6 @@ def record_potential_motion(tag, sample, now):
             tag['acc_deviation_y'].popleft()
             tag['acc_deviation_z'].popleft()
 
-        #deviation_sum_total = abs_sum(tag['acc_deviation_total'])
         deviation_sum_x = abs_sum(tag['acc_deviation_x'])
         deviation_sum_y = abs_sum(tag['acc_deviation_y'])
         deviation_sum_z = abs_sum(tag['acc_deviation_z'])

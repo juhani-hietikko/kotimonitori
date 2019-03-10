@@ -123,6 +123,19 @@ resources:
         TimeToLiveSpecification:
           AttributeName: Expires
           Enabled: true
+    TagConfigurationTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: TagConfiguration
+        AttributeDefinitions:
+          - AttributeName: Tag
+            AttributeType: S
+        KeySchema:
+          - AttributeName: Tag
+            KeyType: HASH
+        SSESpecification:
+          SSEEnabled: true
+        BillingMode: PAY_PER_REQUEST
     FreezerHighTemperatureAlarm:
       Type: AWS::CloudWatch::Alarm
       Properties:
