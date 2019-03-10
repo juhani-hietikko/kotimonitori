@@ -57,6 +57,10 @@ tags = {
     'E2:A8:17:03:41:6D': {
         'name': 'Front Door',
         'is_door_sensor': True,
+    },
+    'C7:74:89:CD:F5:E1': {
+        'name': 'TK Door',
+        'is_door_sensor': True,
     }
 }
 
