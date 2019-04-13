@@ -16,12 +16,45 @@ def dynamo_list(list):
     return [{'N': str(val)} for val in list]
 
 
+def recent_detection_exists(tag, timestamp_now_ms):
+    recent_detections = dynamo.query(
+        TableName='DoorSensorDetection',
+        KeyConditionExpression='Tag = :tag AND EventTime > :time_limit',
+        ExpressionAttributeValues={':tag': {'S': tag},
+                                   ':time_limit': {'N': str(timestamp_now_ms - 60000)}}
+    )['Items']
+    return len(recent_detections) > 0
+
+
+def target_breached(target_tag_outer, target_tag_inner, detecting_tag, timestamp_now_ms):
+    return detecting_tag == target_tag_inner and recent_detection_exists(target_tag_outer, timestamp_now_ms)
+
+
 def handle(event, context):
     req_body = json.loads(event['body'])
     tag = req_body['tag']
     now = datetime.utcnow()
     timestamp_ms = math.floor(1000 * now.timestamp())
     expires = math.floor((now + timedelta(days=30)).timestamp())
+
+    # todo: replace hard-coded target configuration with something else
+    if tag == 'TK Door':
+        target = 'Front Entrance'
+        target_tag_outer = 'Front Door'
+        target_tag_inner = 'TK Door'
+    elif tag == 'Back Door':
+        target = 'Back Entrance'
+        target_tag_outer = 'Back Door Out'
+        target_tag_inner = 'Back Door'
+    else:
+        target = None
+        target_tag_outer = None
+        target_tag_inner = None
+
+    if target and is_target_active_now(dynamo, target) and target_breached(target_tag_outer, target_tag_inner, tag, timestamp_ms):
+        notification_url = 'https://maker.ifttt.com/trigger/door_alarm_notification/with/key/' + ifttt_key + '?value1=' + urllib.parse.quote(target)
+        requests.post(notification_url)
+
 
     acc_total = dynamo_list(req_body['acceleration_samples']['total'])
     acc_x = dynamo_list(req_body['acceleration_samples']['x'])
@@ -41,8 +74,6 @@ def handle(event, context):
             'Expires': {'N': str(expires)}
         }
     )
-    notification_url = 'https://maker.ifttt.com/trigger/door_alarm_notification/with/key/' + ifttt_key + '?value1=' + urllib.parse.quote(tag)
-    requests.post(notification_url)
 
     response = {
         'statusCode': 200,

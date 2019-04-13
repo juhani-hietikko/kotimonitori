@@ -3,3 +3,4 @@ img
 notes.txt
 node_modules
 alertcenter/.serverless
+alertcenter/pytz*
