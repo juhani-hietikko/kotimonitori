@@ -2,16 +2,18 @@
 import boto3
 import math
 import argparse
+import json
+import requests
 from datetime import datetime
 from argparse import RawTextHelpFormatter
 
 
-actions = ['list']
+actions = ['list', 'simulate']
 
 
 description = """
 
-tool for listing recent detections from AWS DynamoDB
+tool for listing recent detections from AWS DynamoDB, and for simulating detection handling
 """
 
 
@@ -24,6 +26,8 @@ def read_args():
                         help='Name of tag to list detections for')
     parser.add_argument('--minutes',
                         help='For how many minutes in the past to list')
+    parser.add_argument('--apikey',
+                        help='API key for detection simulation')
     return parser.parse_args()
 
 
@@ -44,3 +48,18 @@ if __name__ == '__main__':
                                        ':time_limit': {'N': str(timestamp_now_ms - 60000 * int(args.minutes))}}
         )['Items']
         print(detection_items)
+    elif args.action == 'simulate':
+        assert(args.tag)
+        assert(args.apikey)
+        requests.post('https://jhie.name/doorsensordetection',
+                                  headers={'X-Api-Key': args.apikey,
+                                           'Content-type': 'application/json'},
+                                  data = json.dumps({
+                                      'tag': args.tag,
+                                      'acceleration_samples': {
+                                          'total': [20, 20, 20],
+                                          'x': [20, 20, 20],
+                                          'y': [20, 20, 20],
+                                          'z': [20, 20, 20]
+                                      }
+                                  }))
