@@ -14,7 +14,7 @@ def is_schedule_active_now(schedule_item, time_now):
     start_time = helsinki_timestamp(time_now, start_hours, start_minutes)
     end_time = helsinki_timestamp(time_now, end_hours, end_minutes)
 
-    if (start_time - end_time).seconds > 0:
+    if start_time > end_time:
         start_time_yesterday = start_time - timedelta(days=1)
         end_time_tomorrow = end_time + timedelta(days=1)
         return (time_now > start_time and time_now < end_time_tomorrow) or (time_now > start_time_yesterday and time_now < end_time)
