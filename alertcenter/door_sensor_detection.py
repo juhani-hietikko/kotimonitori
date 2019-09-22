@@ -53,8 +53,9 @@ def handle(event, context):
 
     if target and is_target_active_now(dynamo, target) and target_breached(target_tag_outer, target_tag_inner, tag, timestamp_ms):
         notification_url = 'https://maker.ifttt.com/trigger/door_alarm_notification/with/key/' + ifttt_key + '?value1=' + urllib.parse.quote(target)
+        siren_trigger_url = 'https://maker.ifttt.com/trigger/alarm_siren/with/key/' + ifttt_key
         requests.post(notification_url)
-
+        requests.post(siren_trigger_url)
 
     acc_total = dynamo_list(req_body['acceleration_samples']['total'])
     acc_x = dynamo_list(req_body['acceleration_samples']['x'])
