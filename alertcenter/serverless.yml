@@ -168,7 +168,7 @@ resources:
         EvaluationPeriods: 5
         MetricName: Temperature
         Namespace: HomeEnvironV1
-        Period: 60
+        Period: 300
         Statistic: Maximum
         Threshold: -18.0
         TreatMissingData: ignore
@@ -187,7 +187,7 @@ resources:
         EvaluationPeriods: 5
         MetricName: Temperature
         Namespace: HomeEnvironV1
-        Period: 60
+        Period: 300
         Statistic: Minimum
         Threshold: -30.0
         TreatMissingData: ignore
@@ -206,7 +206,7 @@ resources:
         EvaluationPeriods: 5
         MetricName: Temperature
         Namespace: HomeEnvironV1
-        Period: 60
+        Period: 300
         Statistic: Maximum
         Threshold: 4.5
         TreatMissingData: ignore
@@ -225,7 +225,7 @@ resources:
         EvaluationPeriods: 5
         MetricName: Temperature
         Namespace: HomeEnvironV1
-        Period: 60
+        Period: 300
         Statistic: Minimum
         Threshold: 0.1
         TreatMissingData: ignore
